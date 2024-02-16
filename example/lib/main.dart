@@ -35,28 +35,18 @@ class _MyAppState extends State<MyApp> {
       home: SecureApplication(
         nativeRemoveDelay: 1000,
         onNeedUnlock: (secure) async {
-          print(
-              'need unlock maybe use biometric to confirm and then sercure.unlock() or you can use the lockedBuilder');
-          // var authResult = authMyUser();
-          // if (authResul) {
-          //  secure.unlock();
-          //  return SecureApplicationAuthenticationStatus.SUCCESS;
-          //}
-          // else {
-          //  return SecureApplicationAuthenticationStatus.FAILED;
-          //}
+          print('need unlock maybe use biometric to confirm and then sercure.unlock() or you can use the lockedBuilder');
           return null;
         },
         onAuthenticationFailed: () async {
           // clean you data
+
           setState(() {
             failedAuth = true;
           });
           print('auth failed');
         },
         onAuthenticationSucceed: () async {
-          // clean you data
-
           setState(() {
             failedAuth = false;
           });
@@ -66,25 +56,14 @@ class _MyAppState extends State<MyApp> {
           if (subLock == null)
             subLock = SecureApplicationProvider.of(context, listen: false)
                 ?.lockEvents
-                .listen((s) => history.add(
-                    '${DateTime.now().toIso8601String()} - ${s ? 'locked' : 'unlocked'}'));
+                .listen((s) => history.add('${DateTime.now().toIso8601String()} - ${s ? 'locked' : 'unlocked'}'));
           return SecureGate(
             blurr: blurr,
             opacity: opacity,
-            lockedBuilder: (context, secureNotifier) => Center(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                ElevatedButton(
-                  child: Text('UNLOCK'),
-                  onPressed: () => secureNotifier?.authSuccess(unlock: true),
-                ),
-                ElevatedButton(
-                  child: Text('FAIL AUTHENTICATION'),
-                  onPressed: () => secureNotifier?.authFailed(unlock: true),
-                ),
-              ],
-            )),
+            lockedBuilder: (context, secureNotifier) {
+              secureNotifier?.authSuccess(unlock: true);
+              return Center();
+            },
             child: Scaffold(
               appBar: AppBar(
                 title: const Text('Secure Window Example'),
@@ -92,9 +71,7 @@ class _MyAppState extends State<MyApp> {
               body: Center(
                 child: Builder(builder: (context) {
                   var valueNotifier = SecureApplicationProvider.of(context);
-                  if (valueNotifier == null)
-                    throw new Exception(
-                        'Unable to find secure application context');
+                  if (valueNotifier == null) throw new Exception('Unable to find secure application context');
                   return ListView(
                     children: <Widget>[
                       Text('This is secure content'),
@@ -109,13 +86,11 @@ class _MyAppState extends State<MyApp> {
                                   ),
                                   state.paused
                                       ? ElevatedButton(
-                                          onPressed: () =>
-                                              valueNotifier.unpause(),
+                                          onPressed: () => valueNotifier.unpause(),
                                           child: Text('resume security'),
                                         )
                                       : ElevatedButton(
-                                          onPressed: () =>
-                                              valueNotifier.pause(),
+                                          onPressed: () => valueNotifier.pause(),
                                           child: Text('pause security'),
                                         ),
                                 ],
@@ -125,9 +100,7 @@ class _MyAppState extends State<MyApp> {
                                 child: Text('Secure app'),
                               ),
                       ),
-                      if (failedAuth == null)
-                        Text(
-                            'Lock the app then switch to another app and come back'),
+                      if (failedAuth == null) Text('Lock the app then switch to another app and come back'),
                       if (failedAuth != null)
                         failedAuth
                             ? Text(
@@ -143,8 +116,7 @@ class _MyAppState extends State<MyApp> {
                       ),
                       StreamBuilder(
                         stream: valueNotifier.authenticationEvents,
-                        builder: (context, snapshot) =>
-                            Text('Last auth status is: ${snapshot.data}'),
+                        builder: (context, snapshot) => Text('Last auth status is: ${snapshot.data}'),
                       ),
                       ElevatedButton(
                         onPressed: () => valueNotifier.lock(),
@@ -156,11 +128,7 @@ class _MyAppState extends State<MyApp> {
                           children: <Widget>[
                             Text('Blurr:'),
                             Expanded(
-                              child: Slider(
-                                  value: blurr,
-                                  min: 0,
-                                  max: 100,
-                                  onChanged: (v) => setState(() => blurr = v)),
+                              child: Slider(value: blurr, min: 0, max: 100, onChanged: (v) => setState(() => blurr = v)),
                             ),
                             Text(blurr.floor().toString()),
                           ],
@@ -172,12 +140,7 @@ class _MyAppState extends State<MyApp> {
                           children: <Widget>[
                             Text('opacity:'),
                             Expanded(
-                              child: Slider(
-                                  value: opacity,
-                                  min: 0,
-                                  max: 1,
-                                  onChanged: (v) =>
-                                      setState(() => opacity = v)),
+                              child: Slider(value: opacity, min: 0, max: 1, onChanged: (v) => setState(() => opacity = v)),
                             ),
                             Text((opacity * 100).floor().toString() + "%"),
                           ],
